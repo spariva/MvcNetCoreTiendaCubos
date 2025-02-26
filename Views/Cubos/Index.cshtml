@@ -49,15 +49,15 @@
                 @Html.DisplayFor(modelItem => item.Marca)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Imagen)
+                <img src="~/images/@item.Imagen" alt="imagen cubo" width="260px"/>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Precio)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                @Html.ActionLink("Edit", "Edit", new { id=item.IdCubo }) |
+                @Html.ActionLink("Details", "Details", new { id=item.IdCubo }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.IdCubo })
             </td>
         </tr>
 }
