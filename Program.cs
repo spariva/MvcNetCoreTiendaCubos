@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MvcNetCoreTiendaCubos.Data;
 using MvcNetCoreTiendaCubos.Repositories;
+using MvcNetCoreTiendaCubos.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ string connectionString = builder.Configuration.GetConnectionString("MySqlCubos"
 builder.Services.AddDbContext<CubosContext>(options => options.UseMySQL(connectionString));
 
 builder.Services.AddTransient<RepositoryCubos>();
+builder.Services.AddTransient<HelperPathProvider>();
 
 builder.Services.AddSession();
 builder.Services.AddDistributedMemoryCache();
@@ -29,6 +31,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseStaticFiles();
 
 app.UseAuthorization();
 app.UseSession();

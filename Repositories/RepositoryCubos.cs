@@ -45,8 +45,7 @@ namespace MvcNetCoreTiendaCubos.Repositories
             }
             else
             {
-                return await this.context.cubos.MaxAsync
-                    (x => x.IdCubo) + 1;
+                return await this.context.cubos.MaxAsync(x => x.IdCubo) + 1;
             }
         }
 
@@ -60,6 +59,24 @@ namespace MvcNetCoreTiendaCubos.Repositories
             cubo.Imagen = imagen;
             cubo.Precio = precio;
             this.context.cubos.Add(cubo);
+            await this.context.SaveChangesAsync();
+        }
+
+        public async Task UpdateCuboAsync(int idCubo, string nombre, string modelo, string marca, string imagen, int precio)
+        {
+            Cubo cubo = await this.FindCuboAsync(idCubo);
+            cubo.Nombre = nombre;
+            cubo.Modelo = modelo;
+            cubo.Marca = marca;
+            cubo.Imagen = imagen;
+            cubo.Precio = precio;
+            await this.context.SaveChangesAsync();
+        }
+
+        public async Task DeleteCuboAsync(int idCubo)
+        {
+            Cubo cubo = await this.FindCuboAsync(idCubo);
+            this.context.cubos.Remove(cubo);
             await this.context.SaveChangesAsync();
         }
 
