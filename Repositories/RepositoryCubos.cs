@@ -22,6 +22,8 @@ namespace MvcNetCoreTiendaCubos.Repositories
             this.context = context;
         }
 
+        #region CRUD
+
         public async Task<List<Cubo>> GetCubosAsync()
         {
             var consulta = from datos in this.context.cubos
@@ -79,6 +81,39 @@ namespace MvcNetCoreTiendaCubos.Repositories
             this.context.cubos.Remove(cubo);
             await this.context.SaveChangesAsync();
         }
+
+        public async Task<List<Cubo>> GetCubosSessionAsync(List<int> ids)
+        {
+            var consulta = from datos in this.context.cubos
+                           where ids.Contains(datos.IdCubo)
+                           select datos;
+
+            if (consulta == null)
+            {
+                return null;
+            }
+
+            return await consulta.ToListAsync();
+        }
+
+        #endregion
+
+
+        #region Comprar
+
+        public async Task InsertCompraAsync(int idCubo, int cantidad, int precio)
+        {
+            Compra compra = new Compra();
+            compra.IdCubo = idCubo;
+            compra.Cantidad = cantidad;
+            compra.Precio = precio;
+            compra.FechaPedido = DateTime.Now;
+            this.context.compras.Add(compra);
+            await this.context.SaveChangesAsync();
+        }
+
+        #endregion
+
 
 
     }

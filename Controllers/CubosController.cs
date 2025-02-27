@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using MvcNetCoreTiendaCubos.Extensions;
 using MvcNetCoreTiendaCubos.Helpers;
 using MvcNetCoreTiendaCubos.Models;
 using MvcNetCoreTiendaCubos.Repositories;
@@ -9,11 +11,13 @@ namespace MvcNetCoreTiendaCubos.Controllers
     {
         private RepositoryCubos repo;
         private HelperPathProvider helperPath;
+        private IMemoryCache memoryCache;
 
-        public CubosController(RepositoryCubos repo, HelperPathProvider helperPath)
+        public CubosController(RepositoryCubos repo, HelperPathProvider helperPath, IMemoryCache memoryCache)
         {
             this.repo = repo;
             this.helperPath = helperPath;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<IActionResult> Index()
@@ -22,6 +26,7 @@ namespace MvcNetCoreTiendaCubos.Controllers
             return View(cubos);
         }
 
+        #region CRUD
         public async Task<IActionResult> Details(int id)
         {
             Cubo cubo = await this.repo.FindCuboAsync(id);
@@ -77,6 +82,119 @@ namespace MvcNetCoreTiendaCubos.Controllers
             await this.repo.DeleteCuboAsync(id);
             return RedirectToAction("Index");
         }
+        #endregion
+
+        #region Favs
+
+        public async Task<IActionResult> Favoritos()
+        {
+            List<Cubo> favs = this.memoryCache.Get<List<Cubo>>("Favoritos");
+            if (favs == null)
+            {
+                ViewBag.Mensaje = "No hay cubos en favoritos";
+                return View();
+            }
+            else if (favs.Count == 0)
+            {
+                ViewBag.Mensaje = "No hay cubos en favoritos";
+                this.memoryCache.Remove("Favoritos");
+                return View();
+            }
+
+            return View(favs);
+        }
+
+        public async Task<IActionResult> AddFav(int id)
+        {
+            List<Cubo> favs = this.memoryCache.Get<List<Cubo>>("Favoritos");
+            if (favs == null)
+            {
+                favs = new List<Cubo>();
+            }
+
+            Cubo cubo = await this.repo.FindCuboAsync(id);
+            favs.Add(cubo);
+            this.memoryCache.Set("Favoritos", favs);
+
+            return RedirectToAction("Index");
+        }
+
+
+        public IActionResult RemoveFav(int? id)
+        {
+            List<Cubo> favs = this.memoryCache.Get<List<Cubo>>("Favoritos");
+
+            if (favs.Count == 1)
+            {
+                this.memoryCache.Remove("Favoritos");
+                return RedirectToAction("Index");
+            }
+
+            Cubo cubo = favs.SingleOrDefault(x => x.IdCubo == id);
+            favs.Remove(cubo);
+            this.memoryCache.Set("Favoritos", favs);
+
+            return RedirectToAction("Index");
+        }
+
+
+
+
+
+        #endregion
+
+        #region Carrito
+
+        public async Task<IActionResult> Carrito()
+        {
+            List<int> idsCarrito = HttpContext.Session.GetObject<List<int>>("Ids");
+            if (idsCarrito == null)
+            {
+                ViewBag.Mensaje = "No hay cubos en la cesta";
+                return View();
+            }
+            else if (idsCarrito.Count == 0)
+            {
+                ViewBag.Mensaje = "No hay cubos en la cesta";
+                HttpContext.Session.Remove("Ids");
+                return View();
+            }
+
+            List<Cubo> cubos = await this.repo.GetCubosSessionAsync(idsCarrito);
+            return View(cubos);
+        }
+
+        public async Task<IActionResult> AddCart(int id)
+        {
+            List<int> idsCarrito = HttpContext.Session.GetObject<List<int>>("Ids");
+            if (idsCarrito == null)
+            {
+                idsCarrito = new List<int>();
+            }
+
+            //si ya está no puede volver a comprarlo.
+            if (idsCarrito.Contains(id))
+            {
+                return RedirectToAction("Index");
+            }
+
+            idsCarrito.Add(id);
+            HttpContext.Session.SetObject("Ids", idsCarrito);
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> RemoveCart(int id)
+        {
+            List<int> idsCarrito = HttpContext.Session.GetObject<List<int>>("Ids");
+            idsCarrito.Remove(id);
+            HttpContext.Session.SetObject("Ids", idsCarrito);
+            return RedirectToAction("Carrito");
+        }
+
+        #endregion
+
+        
+
 
 
 

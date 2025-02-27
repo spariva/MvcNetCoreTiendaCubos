@@ -15,7 +15,6 @@ builder.Services.AddTransient<RepositoryCubos>();
 builder.Services.AddTransient<HelperPathProvider>();
 
 builder.Services.AddSession();
-builder.Services.AddDistributedMemoryCache();
 builder.Services.AddMemoryCache();
 
 

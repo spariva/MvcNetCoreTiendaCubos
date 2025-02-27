@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Index";
+
+    List<Cubo> favs = memoryCache.Get<List<Cubo>>("Favoritos") ?? new List<Cubo>();
+    List<int> idsCarrito = Context.Session.GetObject<List<int>>("Carrito") ?? new List<int>();
 }
 
 <h1>Index</h1>
@@ -55,9 +58,32 @@
                 @Html.DisplayFor(modelItem => item.Precio)
             </td>
             <td>
+                    @if (favs.Any(x => x.IdCubo == item.IdCubo))
+                    {
+                        <a asp-action="RemoveFav" asp-route-id="@item.IdCubo">
+                        <img src="https://imgs.search.brave.com/fvXYN1T7X28RbKoAsDg0Lre674CrpIRWOGMfTW9belw/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9jZG4y/Lmljb25maW5kZXIu/Y29tL2RhdGEvaWNv/bnMvem9oYW5pbWFz/aS1idW5kbGUtMi81/MTIvaGVhcnRfMi0x/MjgucG5n" width="40" />
+                        </a>
+                    }else{
+                        <a asp-action="AddFav" asp-route-id="@item.IdCubo">
+                            <img src="https://imgs.search.brave.com/2jVBDFkUonU-HGRS7w8fQ1gIrAXDcT2IPg0Pci3OID0/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9jZG4y/Lmljb25maW5kZXIu/Y29tL2RhdGEvaWNv/bnMvY2lyY3VsYXIt/aWNvbnMtZmlsbGVk/Lzc4L0NpcmN1bGFy/X0hlYXJ0LTEyOC5w/bmc" width="40" />
+                        </a>
+                    }
+            </td>
+            <td>
+                    @if (idsCarrito.Contains(item.IdCubo))
+                    {
+                        <img src="https://static.vecteezy.com/system/resources/thumbnails/011/858/556/small_2x/green-check-mark-icon-with-circle-tick-box-check-list-circle-frame-checkbox-symbol-sign-png.png" width="40" />
+
+                    }
+                    else
+                    {
+                        <a asp-action="AddCart" asp-route-id="@item.IdCubo">Agregar al carrito</a>
+                    }
+            </td>
+            <td>
                 @Html.ActionLink("Edit", "Edit", new { id=item.IdCubo }) |
                 @Html.ActionLink("Details", "Details", new { id=item.IdCubo }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.IdCubo })
+                @Html.ActionLink("Delete", "Delete", new { id = item.IdCubo }) |
             </td>
         </tr>
 }

@@ -1,0 +1,65 @@
+﻿@model IEnumerable<MvcNetCoreTiendaCubos.Models.Cubo>
+
+@{
+    ViewData["Title"] = "Favoritos";
+}
+
+<h1>Favoritos</h1>
+@if(Model == null){
+<p>No hay favoritos</p>
+}
+else{
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.IdCubo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nombre)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Modelo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Marca)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Imagen)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Precio)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdCubo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nombre)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Modelo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Marca)
+            </td>
+            <td>
+               <img src="~/images/@item.Imagen" alt="imagen cubo" width="260px" />
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Precio)
+            </td>
+            <td>
+               <a asp-action="RemoveFav" asp-route-id="@item.IdCubo">Quitar fav</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+}
